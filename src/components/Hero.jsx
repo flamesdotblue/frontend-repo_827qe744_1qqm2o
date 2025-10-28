@@ -1,43 +1,65 @@
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Spline from '@splinetool/react-spline';
+import gsap from 'gsap';
+import SplitType from 'split-type';
 
 export default function Hero() {
+  const titleRef = useRef(null);
+  const subtitleRef = useRef(null);
+  const badgeRef = useRef(null);
+
+  useEffect(() => {
+    // Split the title into lines for animation
+    const split = new SplitType(titleRef.current, { types: 'lines' });
+
+    // Ensure lines are block-level for correct transforms
+    split.lines?.forEach((line) => {
+      line.style.overflow = 'hidden';
+      line.style.display = 'block';
+    });
+
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    tl.from(badgeRef.current, { y: 12, opacity: 0, duration: 0.5 })
+      .from(split.lines, { yPercent: 100, opacity: 0, duration: 0.8, stagger: 0.06 }, '-=0.1')
+      .from(subtitleRef.current, { y: 12, opacity: 0, duration: 0.6 }, '-=0.2');
+
+    return () => {
+      tl.kill();
+      split.revert();
+    };
+  }, []);
+
   return (
     <section id="home" className="relative">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 md:py-24 grid md:grid-cols-2 gap-10 items-center">
         <div className="relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+          <div
+            ref={badgeRef}
             className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70"
           >
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
             Open to opportunities • 3+ years experience
-          </motion.div>
+          </div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.05 }}
+          <h1
+            ref={titleRef}
             className="mt-5 text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white"
           >
             Software Engineer crafting modern, animated web experiences
-          </motion.h1>
+          </h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
+          <p
+            ref={subtitleRef}
             className="mt-5 max-w-xl text-base sm:text-lg text-white/70"
           >
             Specializing in React, Next.js, Tailwind CSS, GSAP, and Framer Motion. I build fast, accessible, and playful interfaces.
-          </motion.p>
+          </p>
 
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.15 }}
+            transition={{ duration: 0.7, delay: 0.25 }}
             className="mt-8 flex flex-wrap gap-3"
           >
             <a
